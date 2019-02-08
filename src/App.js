@@ -1,28 +1,43 @@
-import React, { useState, useEffect } from 'react';
-
+import React, {useReducer} from 'react';
+import Form from './Form';
 import './App.css';
 
-const useFetch = (url) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(async() => {
-    const response = await fetch(url);
-    const data = await response.json();
-    const [item] = data.results;
-    setData(item);
-    setLoading(false);
-  }, []);
+const todosReducer = (todos, action) => {
+  switch(action.type){
+    case 'ADD_TODO':
+      return [{text: action.text, complete: false}, ...todos];
+    case 'TOGGLE_COMPLETE':
+      return todos.map(
+        (todo, k) => k===action.i ? {
+          ...todo,
+          complete: !todo.complete
+        } : todo
+      );
+    case 'RESET':
+        return [];
+    default:
+        return todos;
+  }
+};
 
-  return {data, loading};
-}
 export default () => {
-  const [count, setCount] = useState(0);
-  const {data, loading} = useFetch('https://api.randomuser.me/');
+  const [todos, dispatch] = useReducer(todosReducer, []);
+  
   return(
     <div className="App" style={{textAlign: "center"}}>
-      <p>clicked {count}</p>
-      <button onClick={() => setCount(count+1)}>click</button>
-      {loading ? <div>loading</div> : <div>{data.name.first}</div>}
+      <Form dispatch={dispatch}/>
+      <div>
+        {
+          todos.map(({text, complete}, i) => (
+            <div key={text} onClick={() => dispatch({ type: 'TOGGLE_COMPLETE', i})}
+              style={{ textDecoration: complete ? 'line-through' : ''}}
+            >
+              {text}
+            </div>
+          ))
+        }
+      </div>
+      <button onClick={() => dispatch({type: 'RESET'})}>reset</button>
     </div>
   );
 }

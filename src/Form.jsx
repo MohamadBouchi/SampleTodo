@@ -10,15 +10,16 @@ const useInputvalue = (initialValue) => {
     }
 }
 
-export default ({onSubmit}) => {
+export default React.memo(({dispatch}) => {
+    console.log('test')
     const {resetValue, ...text} = useInputvalue("");
     return(
         <form onSubmit={e => {
             e.preventDefault();
-            onSubmit(text.value);
+            dispatch({text: text.value, type: 'ADD_TODO'});
             resetValue();
             }}>
             <input {...text}/>
         </form>
     );
-}
+});
