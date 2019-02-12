@@ -1,17 +1,18 @@
 import React, {useReducer} from 'react';
 import Form from './Form';
 import './App.css';
-import {produce} from 'immer';
+
 const todosReducer = (todos, action) => {
   switch(action.type){
     case 'ADD_TODO':
-      return produce(todos,(draftState)=>{
-        draftState.unshift({text: action.text, complete: false})
-      });
+      return [{text: action.text, complete: false}, ...todos];
     case 'TOGGLE_COMPLETE':
-      return produce(todos, (draftState)=>{
-        draftState[action.i].complete = !draftState[action.i].complete;
-      });
+      return todos.map(
+        (todo, k) => k===action.i ? {
+          ...todo,
+          complete: !todo.complete
+        } : todo
+      );
     case 'RESET':
         return [];
     default:

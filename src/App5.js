@@ -2,16 +2,18 @@ import React, {useReducer} from 'react';
 import Form from './Form';
 import './App.css';
 import {produce} from 'immer';
+
+function useImmerReducer(reducer, initialState) {
+  return React.useReducer(produce(reducer), initialState);
+}
 const todosReducer = (todos, action) => {
   switch(action.type){
     case 'ADD_TODO':
-      return produce(todos,(draftState)=>{
-        draftState.unshift({text: action.text, complete: false})
-      });
+      todos.unshift({text: action.text, complete: false})
+      return;
     case 'TOGGLE_COMPLETE':
-      return produce(todos, (draftState)=>{
-        draftState[action.i].complete = !draftState[action.i].complete;
-      });
+      todos[action.i].complete = !todos[action.i].complete;
+      return;
     case 'RESET':
         return [];
     default:
@@ -20,7 +22,7 @@ const todosReducer = (todos, action) => {
 };
 
 export default () => {
-  const [todos, dispatch] = useReducer(todosReducer, []);
+  const [todos, dispatch] = useImmerReducer(todosReducer, []);
   
   return(
     <div className="App" style={{textAlign: "center"}}>
